@@ -3,7 +3,7 @@
 import re
 import sys
 import getpass
-import subprocess
+import os
 
 from invoke import run, task
 
@@ -25,7 +25,7 @@ def install_roles(force=False, ignore_errors=False):
 
 
 @task
-def play(playbook, user, inventory=SITE_INVENTORY, sudo=True, ask_pass=False, ask_sudo_pass=True, ask_vault_pass=True,
+def play(playbook, user, inventory=SITE_INVENTORY, sudo=True, ask_pass=False, ask_sudo_pass=True, ask_vault_pass=False,
          verbose=False, extra=None, extra_vars=None, key=None, limit=None, tags=None, list_tasks=False):
     """Run a playbook. Defaults to using the "hosts" inventory"""
     print('[invoke] Playing {0!r} on {1!r} with user {2!r}...'.format(
@@ -44,7 +44,7 @@ def play(playbook, user, inventory=SITE_INVENTORY, sudo=True, ask_pass=False, as
         cmd += ' --ask-pass'
     if ask_sudo_pass:
         cmd += ' --ask-sudo-pass'
-    if ask_vault_pass:
+    if ask_vault_pass or not os.environ['ANSIBLE_VAULT_PASSWORD_FILE']:
         cmd += ' --ask-vault-pass'
     if verbose:
         cmd += ' -vvvv'
